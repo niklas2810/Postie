@@ -1,0 +1,99 @@
+/*
+ *
+ *      Copyright 2018 Niklas Arndt
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+    id 'java'
+    id 'maven'
+    id 'com.github.johnrengelman.shadow' version '2.0.3'
+}
+
+group 'me.niklas'
+version '0.1'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    compile 'ch.qos.logback:logback-classic:1.2.3'
+    compile 'org.yaml:snakeyaml:1.20'
+    compile 'net.dv8tion:JDA:3.6.0_354'
+    compile 'org.xerial:sqlite-jdbc:3.21.0.1'
+    compile 'org.apache.tomcat:tomcat-jdbc:9.0.8'
+}
+
+task sourcesForRelease(type: Copy) {
+    from 'src/main/java'
+    into 'build/filteredSrc'
+    filter(ReplaceTokens, tokens: [VERSION: version])
+}
+
+compileJava {
+    options.encoding = 'UTF-8'
+    source = sourcesForRelease.destinationDir
+    classpath = sourceSets.main.compileClasspath
+    dependsOn sourcesForRelease
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from "${buildDir}/filteredSrc"
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+javadoc {
+    options.encoding = 'UTF-8'
+    options.addBooleanOption('html5', true)
+}
+
+jar {
+    baseName = project.name
+    manifest {
+        attributes('Implementation-Version': version, 'Main-Class': 'me.niklas.postie.core.Startup')
+    }
+}
+
+shadowJar {
+    classifier = 'withDependencies'
+}
+
+build {
+    dependsOn clean
+    dependsOn jar
+    dependsOn javadocJar
+    dependsOn sourcesJar
+    dependsOn shadowJar
+
+    jar.mustRunAfter clean
+    javadocJar.mustRunAfter jar
+    sourcesJar.mustRunAfter javadocJar
+    shadowJar.mustRunAfter sourcesJar
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.6'
+}
