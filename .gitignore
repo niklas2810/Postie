@@ -3,5 +3,6 @@
 build/
 logs/
 out/
+pages/
 config.yml
 data.db

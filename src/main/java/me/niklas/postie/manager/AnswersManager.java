@@ -21,7 +21,6 @@ import org.apache.tomcat.jdbc.pool.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -35,7 +34,7 @@ import java.util.Map;
 public class AnswersManager {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final String path = System.getProperty("user.dir") + File.separator + "data.db";
+    private final String path = "data.db";
     private final Map<String, Map<String, String>> answers = new HashMap<>();
     private final DataSource source = new DataSource();
 
@@ -43,7 +42,7 @@ public class AnswersManager {
     public AnswersManager() {
         source.setMinIdle(3);
         source.setMaxIdle(8);
-        source.setUrl("jdbc:sqlite:\\" + path);
+        source.setUrl("jdbc:sqlite:" + path);
         source.setDriverClassName("org.sqlite.JDBC");
         logger.info("Database path: " + path);
 
