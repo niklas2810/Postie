@@ -17,22 +17,20 @@
 
 package me.niklas.postie.core;
 
-import me.niklas.postie.command.general.AnswerCommand;
-import me.niklas.postie.command.general.HelpCommand;
-import me.niklas.postie.command.general.RemoveCommand;
-import me.niklas.postie.command.general.VersionCommand;
+import me.niklas.postie.command.general.*;
 import me.niklas.postie.command.random.DiceCommand;
 import me.niklas.postie.command.random.RandomizeCommand;
 import me.niklas.postie.command.voting.VoteCommand;
 import me.niklas.postie.listener.MessageReceiveListener;
 import me.niklas.postie.listener.ReactionListener;
+import me.niklas.postie.listener.ReadyListener;
 import me.niklas.postie.manager.AnswersManager;
 import me.niklas.postie.manager.CommandManager;
 import me.niklas.postie.manager.ReactionManager;
 import me.niklas.postie.manager.StandardsManager;
 import net.dv8tion.jda.core.AccountType;
+import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
-import net.dv8tion.jda.core.entities.Game;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +65,7 @@ public class Postie {
         ConfigurationVerifier verifier = new ConfigurationVerifier();
 
         builder = new JDABuilder(AccountType.BOT);
-        builder.setGame(Game.playing("v. " + VersionInfo.VERSION));
+        builder.setAutoReconnect(true);
         builder.setToken(verifier.getConfig().get("api-token"));
 
         registerListeners();
@@ -99,7 +97,7 @@ public class Postie {
      * Registers all commands, to keep connect() maintainable.
      */
     private void registerCommands() {
-        commandManager.registerCommands(new AnswerCommand(), new VersionCommand(), new RemoveCommand(), new HelpCommand(),
+        commandManager.registerCommands(new AnswerCommand(), new InviteCommand(), new VersionCommand(), new RemoveCommand(), new HelpCommand(),
                 new VoteCommand(), new DiceCommand(), new RandomizeCommand());
     }
 
@@ -107,6 +105,7 @@ public class Postie {
      * Registers all listeners, to keep connect() maintainable.
      */
     private void registerListeners() {
+        builder.addEventListener(new ReadyListener());
         builder.addEventListener(new MessageReceiveListener());
         builder.addEventListener(new ReactionListener());
     }
@@ -125,5 +124,15 @@ public class Postie {
 
     public AnswersManager getAnswersManager() {
         return answersManager;
+    }
+
+    /**
+     * Returns an invite link which can be used to add the bot to a guild.
+     *
+     * @param jda The {@link JDA} instance.
+     * @return An invite link.
+     */
+    public String getInviteLink(JDA jda) {
+        return String.format("https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot", jda.getSelfUser().getId());
     }
 }

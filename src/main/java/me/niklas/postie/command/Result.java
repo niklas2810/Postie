@@ -37,6 +37,17 @@ public class Result {
     private boolean useEmbed = true;
 
     /**
+     * Initializes a new Result which will not send any message to the {@link net.dv8tion.jda.core.entities.Channel}.
+     *
+     * @param origin The original {@link Message}.
+     */
+    public Result(Message origin) {
+        this.origin = origin;
+        this.title = null;
+        this.description = null;
+    }
+
+    /**
      * Initializes a new Result which is supposed to be displayed as a {@link net.dv8tion.jda.core.entities.MessageEmbed}.
      *
      * @param title       The title of the {@link net.dv8tion.jda.core.entities.MessageEmbed}.

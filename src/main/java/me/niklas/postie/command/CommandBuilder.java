@@ -39,10 +39,11 @@ public class CommandBuilder {
             throw new BotNotMentionedException("The bot was not mentioned in the given message.");
         }
         //Index 0: Mention
+        int nameLength = message.getGuild().getSelfMember().getEffectiveName().split(" ").length;
         String content = message.getContentDisplay().trim();
-        String command = content.split(" ")[1];
+        String command = content.split(" ")[nameLength];
         String[] args = content.split(" ").length > 1 ?
-                Arrays.copyOfRange(content.split(" "), 2, content.split(" ").length)
+                Arrays.copyOfRange(content.split(" "), nameLength + 1, content.split(" ").length)
                 : new String[]{};
         return new Instruction(command, args, message);
     }

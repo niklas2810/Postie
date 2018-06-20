@@ -42,8 +42,8 @@ public class MessageReceiveListener extends ListenerAdapter {
         if (event.getAuthor().isBot()) return;
 
         Message message = event.getMessage();
-        if (message.getMentionedMembers().size() > 0) {
-            if (message.getContentDisplay().startsWith("@" + event.getGuild().getSelfMember().getEffectiveName())) {
+        if (message.getMentionedMembers().size() > 0 && message.getMentionedMembers().get(0).equals(event.getGuild().getSelfMember())) {
+            if (message.getContentDisplay().startsWith("@")) {
                 try {
                     Instruction instruction = CommandBuilder.build(message);
                     Result r = Postie.getInstance().getCommandManager().handle(instruction);
