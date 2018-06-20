@@ -51,10 +51,8 @@ public class MessageReceiveListener extends ListenerAdapter {
                         r.send();
                     } else { //Not found OR answer
                         if (Postie.getInstance().getAnswersManager().hasAnswerFor(message.getGuild().getId(), instruction.getAllInput())) {
-                            System.out.println("Sending answer");
                             new Result(Postie.getInstance().getAnswersManager().getAnswerForInput(message.getGuild().getId(), instruction.getAllInput()), message).send();
                         } else {
-                            System.out.println("Did not find anything.");
                             message.addReaction("\u2754").queue();
                         }
                     }
