@@ -71,16 +71,13 @@ public class StatsCommand implements Command {
         long minutes = TimeUnit.MILLISECONDS.toMinutes(uptime) % 60;
         long seconds = TimeUnit.MILLISECONDS.toSeconds(uptime) % 60;
 
-        StringBuilder builder = new StringBuilder();
-        builder.append(days).append(" Days, ").append(hours).append("Hours, ").append(minutes).append(" Minutes and ").append(seconds).append(" Seconds");
-
         result.addField("OS", System.getProperty("os.name"));
         result.addField("RAM", usedMemory + " / " + maxMemory);
         result.addField("JDA version", JDAInfo.VERSION);
         result.addField("Bot version", "v. " + VersionInfo.VERSION);
         result.addField("Ping", message.getJDA().getPing() + "ms");
         result.addField("Java version", System.getProperty("java.runtime.version").replace("+", "_"));
-        result.addField("Uptime", builder.toString());
+        result.addField("Uptime", String.valueOf(days) + " Days, " + hours + "Hours, " + minutes + " Minutes and " + seconds + " Seconds");
 
         return result;
     }

@@ -143,8 +143,8 @@ public class PermissionManager {
 
 
         try (Connection connection = database.getSource().getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM permissions")) {
-            ResultSet result = statement.executeQuery();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM permissions");
+             ResultSet result = statement.executeQuery()) {
             while (result.next()) {
                 String guildId = result.getString("guildId");
                 String userId = result.getString("userId");
@@ -152,7 +152,6 @@ public class PermissionManager {
                 if (!levels.containsKey(guildId)) levels.put(guildId, new HashMap<>());
                 levels.get(guildId).put(userId, level);
             }
-            result.close();
         } catch (SQLException e) {
             logger.warn("Was not able to establish a connection to the database: ", e);
         }

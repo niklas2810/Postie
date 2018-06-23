@@ -130,8 +130,8 @@ public class AnswersManager {
         answers.clear();
 
         try (Connection connection = database.getSource().getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM io")) {
-            ResultSet result = statement.executeQuery();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM io");
+             ResultSet result = statement.executeQuery()) {
             while (result.next()) {
                 String guildId = result.getString("guildId");
                 String input = result.getString("input");
@@ -139,7 +139,6 @@ public class AnswersManager {
                 if (!answers.containsKey(guildId)) answers.put(guildId, new HashMap<>());
                 answers.get(guildId).put(input, answer);
             }
-            result.close();
         } catch (SQLException e) {
             logger.warn("Was not able to establish a connection to the database: ", e);
         }
