@@ -40,6 +40,7 @@ dependencies {
     compile 'net.dv8tion:JDA:3.6.0_354'
     compile 'org.xerial:sqlite-jdbc:3.21.0.1'
     compile 'org.apache.tomcat:tomcat-jdbc:9.0.8'
+    compile 'net.jodah:expiringmap:0.5.8'
 }
 
 task sourcesForRelease(type: Copy) {

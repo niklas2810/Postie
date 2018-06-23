@@ -45,4 +45,9 @@ public class Reactions {
      * The {@link net.dv8tion.jda.core.entities.MessageReaction.ReactionEmote} for a white check mark.
      */
     public static final String WHITE_CHECK_MARK = "\u2705";
+
+    /**
+     * The {@link net.dv8tion.jda.core.entities.MessageReaction.ReactionEmote} for a sleepy "zzz".
+     */
+    public static final String SLEEPY = "\uD83D\uDCA4";
 }

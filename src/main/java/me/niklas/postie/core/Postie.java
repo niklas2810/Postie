@@ -18,6 +18,8 @@
 package me.niklas.postie.core;
 
 import me.niklas.postie.command.general.*;
+import me.niklas.postie.command.managment.DisableCommand;
+import me.niklas.postie.command.managment.EnableCommand;
 import me.niklas.postie.command.permissions.DefaultLevelCommand;
 import me.niklas.postie.command.permissions.LevelCommand;
 import me.niklas.postie.command.permissions.SetlevelCommand;
@@ -56,6 +58,7 @@ public class Postie {
     //More advanced managers, depending on the above
     private final AnswersManager answersManager;
     private final PermissionManager permissionManager;
+    private final DataManager dataManager;
 
     private JDABuilder builder;
 
@@ -64,6 +67,7 @@ public class Postie {
 
         answersManager = new AnswersManager();
         permissionManager = new PermissionManager();
+        dataManager = new DataManager();
 
         connect();
     }
@@ -84,7 +88,6 @@ public class Postie {
 
         logger.info("Registered " + commandManager.getCommands().size() + " commands");
         logger.info("Configuration path: " + verifier.getConfigurationFilePath());
-
         try {
             builder.buildBlocking();
         } catch (LoginException e) {
@@ -110,14 +113,17 @@ public class Postie {
     public void performReload() {
         permissionManager.retrieveFromDatabase();
         answersManager.retrieveFromDatabase();
+        dataManager.clearCache();
     }
 
     /**
      * Registers all commands, to keep connect() maintainable.
      */
     private void registerCommands() {
-        commandManager.registerCommands(new AnswerCommand(), new InviteCommand(), new StatsCommand(), new VersionCommand(), new ReloadCommand(), new RemoveCommand(), new HelpCommand(),
-                new VoteCommand(), new DiceCommand(), new RandomizeCommand(), new DefaultLevelCommand(), new SetlevelCommand(), new LevelCommand());
+        commandManager.registerCommands(new AnswerCommand(), new InviteCommand(), new StatsCommand(), new VersionCommand(),
+                new ReloadCommand(), new RemoveCommand(), new HelpCommand(),
+                new VoteCommand(), new DiceCommand(), new RandomizeCommand(), new DefaultLevelCommand(),
+                new SetlevelCommand(), new LevelCommand(), new EnableCommand(), new DisableCommand());
     }
 
     /**
@@ -151,6 +157,10 @@ public class Postie {
 
     public PermissionManager getPermissionManager() {
         return permissionManager;
+    }
+
+    public DataManager getDataManager() {
+        return dataManager;
     }
 
     /**

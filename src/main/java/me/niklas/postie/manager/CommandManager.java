@@ -22,8 +22,10 @@ import me.niklas.postie.command.Instruction;
 import me.niklas.postie.command.Result;
 import me.niklas.postie.comparator.CommandComparator;
 import me.niklas.postie.core.Postie;
+import me.niklas.postie.util.Reactions;
 import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.exceptions.PermissionException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,6 +103,12 @@ public class CommandManager {
                 if (results.size() > 1) {
                     logger.warn("Warning: More than one result for '" + instruction.getCommand() + "'!");
                 }
+                Command command = results.get(0);
+
+                if (!isCommandEnabled(instruction.getMessage().getGuild().getId(), command)) {
+                    instruction.getMessage().addReaction(Reactions.SLEEPY).queue();
+                    return new Result(instruction.getMessage());
+                }
                 int level = Postie.getInstance().getPermissionManager().getLevelOfUser(
                         instruction.getMessage().getGuild().getId(),
                         instruction.getMessage().getAuthor().getId());
@@ -112,9 +120,9 @@ public class CommandManager {
                         level = 3;
                     }
                 }
-                if (level < results.get(0).getRequiredLevel()) {
+                if (level < command.getRequiredLevel()) {
                     return new Result(String.format("You are not permitted to use that command. (Has: %s, Required: %s)"
-                            , level, results.get(0).getRequiredLevel()), instruction.getMessage());
+                            , level, command.getRequiredLevel()), instruction.getMessage());
                 }
                 return results.get(0).execute(instruction.getMessage(), instruction.getArgs());
             }
@@ -168,5 +176,43 @@ public class CommandManager {
      */
     public List<Command> getCommands() {
         return Collections.unmodifiableList(commands);
+    }
+
+    /**
+     * Disables a command.
+     *
+     * @param guildId     The ID of {@link net.dv8tion.jda.core.entities.Guild}.
+     * @param commandName The name of the {@link Command}.
+     */
+    public void disableCommand(String guildId, String commandName) {
+        JSONObject object = Postie.getInstance().getDataManager().get(guildId);
+        object.put(commandName, "disabled");
+
+        Postie.getInstance().getDataManager().save(guildId, object);
+    }
+
+    /**
+     * Enables a command.
+     *
+     * @param guildId     The ID of {@link net.dv8tion.jda.core.entities.Guild}.
+     * @param commandName The name of the {@link Command}.
+     */
+    public void enableCommand(String guildId, String commandName) {
+        JSONObject object = Postie.getInstance().getDataManager().get(guildId);
+        object.remove(commandName);
+
+        Postie.getInstance().getDataManager().save(guildId, object);
+    }
+
+    /**
+     * Checks whether a {@link Command} is enabled.
+     *
+     * @param guildId The ID of {@link net.dv8tion.jda.core.entities.Guild}.
+     * @param command The {@link Command}.
+     * @return Whether a {@link Command} is enabled.
+     */
+    public boolean isCommandEnabled(String guildId, Command command) {
+        JSONObject object = Postie.getInstance().getDataManager().get(guildId);
+        return !object.has(command.getName()) || !object.getString(command.getName()).equals("disabled");
     }
 }
