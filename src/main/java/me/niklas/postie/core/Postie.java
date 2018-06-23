@@ -116,7 +116,7 @@ public class Postie {
      * Registers all commands, to keep connect() maintainable.
      */
     private void registerCommands() {
-        commandManager.registerCommands(new AnswerCommand(), new InviteCommand(), new VersionCommand(), new ReloadCommand(), new RemoveCommand(), new HelpCommand(),
+        commandManager.registerCommands(new AnswerCommand(), new InviteCommand(), new StatsCommand(), new VersionCommand(), new ReloadCommand(), new RemoveCommand(), new HelpCommand(),
                 new VoteCommand(), new DiceCommand(), new RandomizeCommand(), new DefaultLevelCommand(), new SetlevelCommand(), new LevelCommand());
     }
 
