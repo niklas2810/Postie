@@ -77,7 +77,7 @@ public class StatsCommand implements Command {
         result.addField("Bot version", "v. " + VersionInfo.VERSION);
         result.addField("Ping", message.getJDA().getPing() + "ms");
         result.addField("Java version", System.getProperty("java.runtime.version").replace("+", "_"));
-        result.addField("Uptime", String.valueOf(days) + " Days, " + hours + "Hours, " + minutes + " Minutes and " + seconds + " Seconds");
+        result.addField("Uptime", days + " Days, " + hours + "Hours, " + minutes + " Minutes and " + seconds + " Seconds");
 
         return result;
     }

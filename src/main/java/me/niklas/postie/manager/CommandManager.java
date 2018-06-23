@@ -107,7 +107,7 @@ public class CommandManager {
                 if (instruction.getMessage().getGuild().getOwner().equals(instruction.getMessage().getMember())
                         || instruction.getMessage().getMember().hasPermission(Permission.ADMINISTRATOR)) {
                     if (level < 3) {
-                        Postie.getInstance().getPermissionManager().save(instruction.getMessage().getId(),
+                        Postie.getInstance().getPermissionManager().save(instruction.getMessage().getGuild().getId(),
                                 instruction.getMessage().getAuthor().getId(), 3);
                         level = 3;
                     }
