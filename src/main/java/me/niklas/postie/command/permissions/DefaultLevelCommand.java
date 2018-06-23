@@ -15,44 +15,52 @@
  *  limitations under the License.
  */
 
-package me.niklas.postie.command.general;
+package me.niklas.postie.command.permissions;
 
 import me.niklas.postie.command.Command;
 import me.niklas.postie.command.Result;
-import me.niklas.postie.core.VersionInfo;
+import me.niklas.postie.core.Postie;
+import me.niklas.postie.util.Util;
 import net.dv8tion.jda.core.entities.Message;
 
 /**
- * Created by Niklas on 05.06.2018 in postie
+ * Created by Niklas on 23.06.2018 in postie
  */
-public class VersionCommand implements Command {
+public class DefaultLevelCommand implements Command {
     @Override
     public String getName() {
-        return "version";
+        return "defaultlevel";
     }
 
     @Override
     public String[] getAliases() {
-        return new String[]{"v"};
+        return new String[]{"dl"};
     }
 
     @Override
     public String getDescription() {
-        return "Prints out the version of the bot.";
+        return "Sets the default level for a guild";
     }
 
     @Override
     public String[] getExamples() {
-        return new String[]{"version"};
+        return new String[]{"defaultlevel 1 (Standard)", "defaultlevel 2 (All voting commands)", "defaultlevel 3 (Administrative tasks)"};
     }
 
     @Override
     public int getRequiredLevel() {
-        return 1;
+        return 3;
     }
 
     @Override
     public Result execute(Message message, String[] args) {
-        return new Result("Version", "My current version is v. " + VersionInfo.VERSION, message);
+        if (args.length != 1 || !Util.isInteger(args[0]))
+            return Postie.getInstance().getStandardsManager().getExamples(this, message);
+
+        int level = Integer.valueOf(args[0]);
+        if (level < 0) return new Result("Error", "The number must be larger than 0!", message);
+
+        Postie.getInstance().getPermissionManager().save(message.getGuild().getId(), "default", level);
+        return new Result(String.format("The default level has been set to %s.", level), message);
     }
 }

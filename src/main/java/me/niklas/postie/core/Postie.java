@@ -18,16 +18,16 @@
 package me.niklas.postie.core;
 
 import me.niklas.postie.command.general.*;
+import me.niklas.postie.command.permissions.DefaultLevelCommand;
+import me.niklas.postie.command.permissions.LevelCommand;
+import me.niklas.postie.command.permissions.SetlevelCommand;
 import me.niklas.postie.command.random.DiceCommand;
 import me.niklas.postie.command.random.RandomizeCommand;
 import me.niklas.postie.command.voting.VoteCommand;
 import me.niklas.postie.listener.MessageReceiveListener;
 import me.niklas.postie.listener.ReactionListener;
 import me.niklas.postie.listener.ReadyListener;
-import me.niklas.postie.manager.AnswersManager;
-import me.niklas.postie.manager.CommandManager;
-import me.niklas.postie.manager.ReactionManager;
-import me.niklas.postie.manager.StandardsManager;
+import me.niklas.postie.manager.*;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
@@ -46,14 +46,25 @@ public class Postie {
 
     private static Postie instance;
     private final Logger logger = LoggerFactory.getLogger(Postie.class);
+
+    //Most basic managers
     private final CommandManager commandManager = new CommandManager();
     private final StandardsManager standardsManager = new StandardsManager();
+    private final DatabaseManager databaseManager = new DatabaseManager();
     private final ReactionManager reactionManager = new ReactionManager();
-    private final AnswersManager answersManager = new AnswersManager();
+
+    //More advanced managers, depending on the above
+    private final AnswersManager answersManager;
+    private final PermissionManager permissionManager;
+
     private JDABuilder builder;
 
     public Postie() {
         instance = this;
+
+        answersManager = new AnswersManager();
+        permissionManager = new PermissionManager();
+
         connect();
     }
 
@@ -94,11 +105,19 @@ public class Postie {
     }
 
     /**
+     * Performs a reload, reads in all data again.
+     */
+    public void performReload() {
+        permissionManager.retrieveFromDatabase();
+        answersManager.retrieveFromDatabase();
+    }
+
+    /**
      * Registers all commands, to keep connect() maintainable.
      */
     private void registerCommands() {
-        commandManager.registerCommands(new AnswerCommand(), new InviteCommand(), new VersionCommand(), new RemoveCommand(), new HelpCommand(),
-                new VoteCommand(), new DiceCommand(), new RandomizeCommand());
+        commandManager.registerCommands(new AnswerCommand(), new InviteCommand(), new VersionCommand(), new ReloadCommand(), new RemoveCommand(), new HelpCommand(),
+                new VoteCommand(), new DiceCommand(), new RandomizeCommand(), new DefaultLevelCommand(), new SetlevelCommand(), new LevelCommand());
     }
 
     /**
@@ -124,6 +143,14 @@ public class Postie {
 
     public AnswersManager getAnswersManager() {
         return answersManager;
+    }
+
+    public DatabaseManager getDatabaseManager() {
+        return databaseManager;
+    }
+
+    public PermissionManager getPermissionManager() {
+        return permissionManager;
     }
 
     /**

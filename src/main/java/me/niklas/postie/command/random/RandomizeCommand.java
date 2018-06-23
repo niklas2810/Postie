@@ -51,6 +51,11 @@ public class RandomizeCommand implements Command {
     }
 
     @Override
+    public int getRequiredLevel() {
+        return 1;
+    }
+
+    @Override
     public Result execute(Message message, String[] args) {
         String input = String.join(" ", args).trim();
         if (input.length() == 0 || !input.contains(",")) {

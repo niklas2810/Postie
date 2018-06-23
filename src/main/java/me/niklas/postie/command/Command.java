@@ -45,6 +45,11 @@ public interface Command {
     String[] getExamples();
 
     /**
+     * @return Which minimum permission level is required to execute the command.
+     */
+    int getRequiredLevel();
+
+    /**
      * Processes a {@link Message} in a specific way, e.g. sorting the input.
      *
      * @param message The original {@link Message} sent by the {@link net.dv8tion.jda.core.entities.User}.

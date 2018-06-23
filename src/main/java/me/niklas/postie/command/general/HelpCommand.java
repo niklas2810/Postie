@@ -51,6 +51,11 @@ public class HelpCommand implements Command {
     }
 
     @Override
+    public int getRequiredLevel() {
+        return 1;
+    }
+
+    @Override
     public Result execute(Message message, String[] args) {
         if (args.length == 0) {
             return new Result("General Help", getDefaultHelp(message.getJDA()), message);
@@ -67,9 +72,9 @@ public class HelpCommand implements Command {
     private String getDefaultHelp(JDA jda) {
         List<Command> commandList = Postie.getInstance().getCommandManager().getCommands();
         StringBuilder builder = new StringBuilder();
-        commandList.forEach(command -> builder.append("`").append(command.getName()).append("` - ").append(command.getDescription()).append("\n"));
+        commandList.stream().filter(command -> command.getRequiredLevel() <= 3).forEach(command -> builder.append("`").append(command.getName()).append(" <").append(command.getRequiredLevel()).append(">` - ").append(command.getDescription()).append("\n"));
         builder.append("\nUse `help <command name>` to get a more detailed command description.\n");
-        builder.append("Always feel free to refer to the [Wiki](https://github.com/Chromecube/Postie/wiki) for help or if you have a question.\n");
+        builder.append("Always feel free to refer to the [Wiki](https://github.com/Chromecube/Postie/wiki) for help or if you have a question.\n\n");
         builder.append("You can invite the bot using [this link](").append(Postie.getInstance().getInviteLink(jda)).append(").");
         return builder.toString().trim();
     }

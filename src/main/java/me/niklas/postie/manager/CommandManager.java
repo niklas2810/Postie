@@ -21,6 +21,8 @@ import me.niklas.postie.command.Command;
 import me.niklas.postie.command.Instruction;
 import me.niklas.postie.command.Result;
 import me.niklas.postie.comparator.CommandComparator;
+import me.niklas.postie.core.Postie;
+import net.dv8tion.jda.core.Permission;
 import net.dv8tion.jda.core.exceptions.PermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,6 +101,21 @@ public class CommandManager {
                 if (results.size() > 1) {
                     logger.warn("Warning: More than one result for '" + instruction.getCommand() + "'!");
                 }
+                int level = Postie.getInstance().getPermissionManager().getLevelOfUser(
+                        instruction.getMessage().getGuild().getId(),
+                        instruction.getMessage().getAuthor().getId());
+                if (instruction.getMessage().getGuild().getOwner().equals(instruction.getMessage().getMember())
+                        || instruction.getMessage().getMember().hasPermission(Permission.ADMINISTRATOR)) {
+                    if (level < 3) {
+                        Postie.getInstance().getPermissionManager().save(instruction.getMessage().getId(),
+                                instruction.getMessage().getAuthor().getId(), 3);
+                        level = 3;
+                    }
+                }
+                if (level < results.get(0).getRequiredLevel()) {
+                    return new Result(String.format("You are not permitted to use that command. (Has: %s, Required: %s)"
+                            , level, results.get(0).getRequiredLevel()), instruction.getMessage());
+                }
                 return results.get(0).execute(instruction.getMessage(), instruction.getArgs());
             }
             return null;
@@ -119,12 +136,13 @@ public class CommandManager {
     public String getCommandHelp(Command command) {
         StringBuilder builder = new StringBuilder();
         builder.append("**Description**: ").append(command.getDescription()).append("\n");
+        builder.append("**Required Level**: ").append(command.getRequiredLevel()).append("\n");
         if (command.getAliases().length > 0) {
             builder.append("**Aliases**: ").append(String.join(", ", command.getAliases())).append("\n");
-        } else {
-            builder.append("**Aliases**: -\n");
         }
-        builder.append("**Example Usage**: `\n").append(String.join("\n", command.getExamples()).trim()).append("`\n");
+        if (command.getExamples().length > 0) {
+            builder.append("**Example Usage**: `\n\n").append(String.join("\n", command.getExamples()).trim()).append("`\n");
+        }
         return builder.toString().trim();
     }
 

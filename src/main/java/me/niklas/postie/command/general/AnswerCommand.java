@@ -50,6 +50,11 @@ public class AnswerCommand implements Command {
     }
 
     @Override
+    public int getRequiredLevel() {
+        return 2;
+    }
+
+    @Override
     public Result execute(Message message, String[] args) {
         if (args.length < 2 || (!args[0].equalsIgnoreCase("add") && !args[0].equalsIgnoreCase("remove"))) {
             return Postie.getInstance().getStandardsManager().getExamples(this, message);

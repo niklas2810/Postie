@@ -49,6 +49,11 @@ public class RemoveCommand implements Command {
     }
 
     @Override
+    public int getRequiredLevel() {
+        return 3;
+    }
+
+    @Override
     public Result execute(Message message, String[] args) {
         if (args.length != 1) return Postie.getInstance().getStandardsManager().getExamples(this, message);
 

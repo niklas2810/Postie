@@ -15,35 +15,35 @@
  *  limitations under the License.
  */
 
-package me.niklas.postie.command.general;
+package me.niklas.postie.command.permissions;
 
 import me.niklas.postie.command.Command;
 import me.niklas.postie.command.Result;
-import me.niklas.postie.core.VersionInfo;
+import me.niklas.postie.core.Postie;
 import net.dv8tion.jda.core.entities.Message;
 
 /**
- * Created by Niklas on 05.06.2018 in postie
+ * Created by Niklas on 23.06.2018 in postie
  */
-public class VersionCommand implements Command {
+public class LevelCommand implements Command {
     @Override
     public String getName() {
-        return "version";
+        return "level";
     }
 
     @Override
     public String[] getAliases() {
-        return new String[]{"v"};
+        return new String[0];
     }
 
     @Override
     public String getDescription() {
-        return "Prints out the version of the bot.";
+        return "Displays the level of you or the mentioned user.";
     }
 
     @Override
     public String[] getExamples() {
-        return new String[]{"version"};
+        return new String[]{"level", "level @Niklas"};
     }
 
     @Override
@@ -53,6 +53,13 @@ public class VersionCommand implements Command {
 
     @Override
     public Result execute(Message message, String[] args) {
-        return new Result("Version", "My current version is v. " + VersionInfo.VERSION, message);
+        int level;
+        if (message.getMentionedMembers().size() < 2) {
+            level = Postie.getInstance().getPermissionManager().getLevelOfUser(message.getGuild().getId(), message.getAuthor().getId());
+        } else {
+            level = Postie.getInstance().getPermissionManager().getLevelOfUser(message.getGuild().getId(), message.getMentionedMembers().get(1).getUser().getId());
+        }
+
+        return new Result(String.format("The level of this user is %s.", level), message);
     }
 }

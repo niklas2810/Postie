@@ -50,6 +50,11 @@ public class InviteCommand implements Command {
     }
 
     @Override
+    public int getRequiredLevel() {
+        return 1;
+    }
+
+    @Override
     public Result execute(Message message, String[] args) {
         PrivateChannel channel = message.getAuthor().openPrivateChannel().complete();
         String inviteLink = String.format("You can invite me to your guild using this link: %s", Postie.getInstance().getInviteLink(message.getJDA()));
