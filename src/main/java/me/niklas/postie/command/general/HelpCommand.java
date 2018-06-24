@@ -20,10 +20,7 @@ package me.niklas.postie.command.general;
 import me.niklas.postie.command.Command;
 import me.niklas.postie.command.Result;
 import me.niklas.postie.core.Postie;
-import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Message;
-
-import java.util.List;
 
 /**
  * Created by Niklas on 07.06.2018 in postie
@@ -70,30 +67,14 @@ public class HelpCommand implements Command {
         return Postie.getInstance().getStandardsManager().getExamples(this, message);
     }
 
-    private String getDefaultHelp(JDA jda) {
-        List<Command> commandList = Postie.getInstance().getCommandManager().getCommands();
-        StringBuilder builder = new StringBuilder();
-        commandList.stream().filter(command -> command.getRequiredLevel() <= 3).forEach(command -> builder.append("`").append(command.getName()).append(" <").append(command.getRequiredLevel()).append(">` - ").append(command.getDescription()).append("\n"));
-        builder.append("\nUse `help <command name>` to get a more detailed command description.\n");
-        builder.append("Always feel free to refer to the [Wiki](https://github.com/Chromecube/Postie/wiki) for help or if you have a question.\n\n");
-        builder.append("You can invite the bot using [this link](").append(Postie.getInstance().getInviteLink(jda)).append(").");
-        return builder.toString().trim();
-    }
-
     private Result getDefaultResultHelp(Message message) {
-
-        List<Command> commandList = Postie.getInstance().getCommandManager().getCommands();
         StringBuilder builder = new StringBuilder();
         builder.append("\nUse `help <command name>` to get a more detailed command description.\n");
-        builder.append("Always feel free to refer to the [Wiki](https://github.com/Chromecube/Postie/wiki) for help or if you have a question.\n\n");
-        builder.append("You can invite the bot using [this link](").append(Postie.getInstance().getInviteLink(message.getJDA())).append(").");
+        builder.append("A list of commands with detailed descriptions is available [online](https://github.com/Chromecube/Postie/wiki/Command-List).\n");
+        builder.append("If you don't know how to get started, refer to [this Wiki page](https://github.com/Chromecube/Postie/wiki/Quick-Start-Guide).\n");
+        builder.append("Always feel free to refer to the [Wiki](https://github.com/Chromecube/Postie/wiki) if you have any question or problem.\n\n");
+        builder.append("You can invite the bot using [this link](").append(Postie.getInstance().getInviteLink(message.getJDA())).append(").\n");
 
-        Result result = new Result("General help", builder.toString(), message);
-
-
-        commandList.stream().filter(command -> command.getRequiredLevel() <= 3).forEach(command ->
-                result.addField(command.getName() + " `<" + command.getRequiredLevel() + ">`",
-                        "`" + command.getDescription() + "`", true));
-        return result;
+        return new Result("General help", builder.toString(), message);
     }
 }

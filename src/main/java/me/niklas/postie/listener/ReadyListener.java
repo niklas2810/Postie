@@ -32,7 +32,9 @@ public class ReadyListener extends ListenerAdapter {
 
     @Override
     public void onReady(ReadyEvent event) {
-        event.getJDA().getPresence().setGame(Game.of(Game.GameType.DEFAULT, "v. " + VersionInfo.VERSION, Postie.getInstance().getInviteLink(event.getJDA())));
+        event.getJDA().getPresence().setGame(Game.of(Game.GameType.DEFAULT, "v. " + VersionInfo.VERSION +
+                        " | @" + event.getJDA().getSelfUser().getName() + " help",
+                Postie.getInstance().getInviteLink(event.getJDA())));
         LoggerFactory.getLogger("Invite Link").info(Postie.getInstance().getInviteLink(event.getJDA()));
 
     }

@@ -151,6 +151,7 @@ public class CommandManager {
         if (command.getExamples().length > 0) {
             builder.append("**Example Usage**: `\n\n").append(String.join("\n", command.getExamples()).trim()).append("`\n");
         }
+        builder.append("There may be a [Wiki entry](https://github.com/Chromecube/Postie/wiki/Command-List#").append(command.getName().toLowerCase()).append(") about that command, too.\n");
         return builder.toString().trim();
     }
 
