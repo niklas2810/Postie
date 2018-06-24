@@ -59,7 +59,9 @@ public class DefaultLevelCommand implements Command {
 
         int level = Integer.valueOf(args[0]);
         if (level < 0) return new Result("Error", "The number must be larger than 0!", message);
-
+        if (level > Postie.getInstance().getPermissionManager().getLevelOfUser(message.getGuild().getId(), message.getAuthor().getId())) {
+            return new Result("Error", "The default level can not be higher than your own!", message);
+        }
         Postie.getInstance().getPermissionManager().save(message.getGuild().getId(), "default", level);
         return new Result(String.format("The default level has been set to %s.", level), message);
     }
