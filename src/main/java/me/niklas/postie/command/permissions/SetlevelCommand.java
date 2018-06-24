@@ -56,8 +56,15 @@ public class SetlevelCommand implements Command {
 
     @Override
     public Result execute(Message message, String[] args) {
-        if (message.getMentionedMembers().size() != 2 || !Util.isInteger(args[args.length - 1]))
+        if (message.getMentionedMembers().size() != 2)
             return Postie.getInstance().getStandardsManager().getExamples(this, message);
+        if (!Util.isInteger(args[args.length - 1])) {
+            if (args[args.length - 1].equalsIgnoreCase("reset")) {
+                Postie.getInstance().getPermissionManager().removeUserLevel(message.getGuild().getId(), message.getAuthor().getId());
+                return new Result("The permission level has been removed, default level will be applied.", message);
+            }
+            return Postie.getInstance().getStandardsManager().getExamples(this, message);
+        }
 
         Member target = message.getMentionedMembers().get(1); //@Postie is the first one
         int targetLevel = Integer.valueOf(args[args.length - 1]);

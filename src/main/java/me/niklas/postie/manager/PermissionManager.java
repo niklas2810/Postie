@@ -126,6 +126,17 @@ public class PermissionManager {
     }
 
     /**
+     * Removes a permission level of a {@link net.dv8tion.jda.core.entities.Member} in a specific {@link net.dv8tion.jda.core.entities.Guild}.
+     *
+     * @param guildId The ID of the {@link net.dv8tion.jda.core.entities.Guild}.
+     * @param userId  The ID of the {@link net.dv8tion.jda.core.entities.Member}.
+     */
+    public void removeUserLevel(String guildId, String userId) {
+        if (levels.containsKey(guildId)) levels.get(guildId).remove(userId);
+        database.execute("DELETE FROM permissions WHERE guildId = ? AND userId = ?", guildId, userId);
+    }
+
+    /**
      * Removes a {@link net.dv8tion.jda.core.entities.Guild} completely from the database
      *
      * @param guildId The ID of the {@link net.dv8tion.jda.core.entities.Guild}.
