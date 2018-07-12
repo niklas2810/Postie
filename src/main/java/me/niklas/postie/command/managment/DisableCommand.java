@@ -56,11 +56,11 @@ public class DisableCommand implements Command {
     public Result execute(Message message, String[] args) {
         if (args.length != 1) return Postie.getInstance().getStandardsManager().getExamples(this, message);
 
-        if (!Postie.getInstance().getCommandManager().getCommands().stream().anyMatch(
+        if (Postie.getInstance().getCommandManager().getCommands().stream().noneMatch(
                 command -> command.getName().equalsIgnoreCase(args[0]))) {
             return new Result("Error", String.format("The command `%s` was not found!", args[0].toLowerCase()), message);
         }
-        if (args[0].toLowerCase().equalsIgnoreCase("enable") || args[0].toLowerCase().equalsIgnoreCase("disable")) {
+        if (args[0].equalsIgnoreCase("enable") || args[0].equalsIgnoreCase("disable")) {
             return new Result(String.format("You can not disable `%s`!", args[0].toLowerCase()), message);
         }
         Postie.getInstance().getCommandManager().disableCommand(message.getGuild().getId(), args[0]);

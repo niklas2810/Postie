@@ -101,7 +101,6 @@ public class Postie {
             }
             verifier.saveConfiguration();
             logger.info("The new token has been saved. Please restart to connect to Discord.");
-            System.exit(0);
         } catch (Exception e) {
             logger.error("An error occurred while running the discord bot: ", e);
         }

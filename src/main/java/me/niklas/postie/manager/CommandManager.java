@@ -112,13 +112,12 @@ public class CommandManager {
                 int level = Postie.getInstance().getPermissionManager().getLevelOfUser(
                         instruction.getMessage().getGuild().getId(),
                         instruction.getMessage().getAuthor().getId());
-                if (instruction.getMessage().getGuild().getOwner().equals(instruction.getMessage().getMember())
-                        || instruction.getMessage().getMember().hasPermission(Permission.ADMINISTRATOR)) {
-                    if (level < 3) {
-                        Postie.getInstance().getPermissionManager().save(instruction.getMessage().getGuild().getId(),
-                                instruction.getMessage().getAuthor().getId(), 3);
-                        level = 3;
-                    }
+                if ((instruction.getMessage().getGuild().getOwner().equals(instruction.getMessage().getMember())
+                        || instruction.getMessage().getMember().hasPermission(Permission.ADMINISTRATOR))
+                        && level < 3) {
+                    Postie.getInstance().getPermissionManager().save(instruction.getMessage().getGuild().getId(),
+                            instruction.getMessage().getAuthor().getId(), 3);
+                    level = 3;
                 }
                 if (level < command.getRequiredLevel()) {
                     return new Result(String.format("You are not permitted to use that command. (Has: %s, Required: %s)"
