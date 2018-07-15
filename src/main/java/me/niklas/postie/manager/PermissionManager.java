@@ -19,6 +19,7 @@ package me.niklas.postie.manager;
 
 import me.niklas.postie.core.Postie;
 import me.niklas.postie.util.Util;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,5 +167,21 @@ public class PermissionManager {
         } catch (SQLException e) {
             logger.warn("Was not able to establish a connection to the database: ", e);
         }
+    }
+
+    /**
+     * Returns all data stored in relation with a specific user.
+     *
+     * @param userId The ID of the discord user
+     * @return All data found as a {@link JSONObject} (guildId -> level)
+     */
+    public JSONObject getDataForUser(String userId) {
+        JSONObject data = new JSONObject();
+        for (Map.Entry<String, Map<String, String>> entry : levels.entrySet()) {
+            if (entry.getValue().containsKey(userId)) {
+                data.put(entry.getKey(), entry.getValue().get(userId));
+            }
+        }
+        return data;
     }
 }

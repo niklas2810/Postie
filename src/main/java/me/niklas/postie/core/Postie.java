@@ -20,6 +20,7 @@ package me.niklas.postie.core;
 import me.niklas.postie.command.general.*;
 import me.niklas.postie.command.managment.DisableCommand;
 import me.niklas.postie.command.managment.EnableCommand;
+import me.niklas.postie.command.managment.LeaveCommand;
 import me.niklas.postie.command.permissions.DefaultLevelCommand;
 import me.niklas.postie.command.permissions.LevelCommand;
 import me.niklas.postie.command.permissions.SetlevelCommand;
@@ -119,10 +120,10 @@ public class Postie {
      * Registers all commands, to keep connect() maintainable.
      */
     private void registerCommands() {
-        commandManager.registerCommands(new AnswerCommand(), new InviteCommand(), new StatsCommand(), new VersionCommand(),
+        commandManager.registerCommands(new AnswerCommand(), new InviteCommand(), new PrivacyCommand(), new StatsCommand(), new VersionCommand(),
                 new ReloadCommand(), new RemoveCommand(), new HelpCommand(),
                 new VoteCommand(), new DiceCommand(), new RandomizeCommand(), new DefaultLevelCommand(),
-                new SetlevelCommand(), new LevelCommand(), new EnableCommand(), new DisableCommand());
+                new SetlevelCommand(), new LevelCommand(), new EnableCommand(), new DisableCommand(), new LeaveCommand());
     }
 
     /**
