@@ -173,7 +173,7 @@ public class PermissionManager {
      * Returns all data stored in relation with a specific user.
      *
      * @param userId The ID of the discord user
-     * @return All data found as a {@link JSONObject} (guildId -> level)
+     * @return All data found as a {@link JSONObject} (guildId: level)
      */
     public JSONObject getDataForUser(String userId) {
         JSONObject data = new JSONObject();
