@@ -46,7 +46,11 @@ dependencies {
 task sourcesForRelease(type: Copy) {
     from 'src/main/java'
     into 'build/filteredSrc'
-    filter(ReplaceTokens, tokens: [VERSION: version])
+    filter(ReplaceTokens, tokens: [VERSION: version, DATE: getBuildDate()])
+}
+
+def getBuildDate() {
+    return new Date().format('yyyyMMdd')
 }
 
 compileJava {

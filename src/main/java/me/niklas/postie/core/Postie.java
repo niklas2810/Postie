@@ -17,6 +17,8 @@
 
 package me.niklas.postie.core;
 
+import me.niklas.postie.command.broadcasting.BroadcastCommand;
+import me.niklas.postie.command.broadcasting.NoBroadcastsCommand;
 import me.niklas.postie.command.general.*;
 import me.niklas.postie.command.managment.DisableCommand;
 import me.niklas.postie.command.managment.EnableCommand;
@@ -28,6 +30,7 @@ import me.niklas.postie.command.random.DiceCommand;
 import me.niklas.postie.command.random.RandomizeCommand;
 import me.niklas.postie.command.voting.VoteCommand;
 import me.niklas.postie.listener.MessageReceiveListener;
+import me.niklas.postie.listener.PrivateMessageReceiveListener;
 import me.niklas.postie.listener.ReactionListener;
 import me.niklas.postie.listener.ReadyListener;
 import me.niklas.postie.manager.*;
@@ -61,6 +64,8 @@ public class Postie {
     private final PermissionManager permissionManager;
     private final DataManager dataManager;
 
+    private String maintainerId;
+
     private JDABuilder builder;
 
     public Postie() {
@@ -83,6 +88,8 @@ public class Postie {
         builder = new JDABuilder(AccountType.BOT);
         builder.setAutoReconnect(true);
         builder.setToken(verifier.getConfig().get("api-token"));
+
+        maintainerId = verifier.getConfig().get("maintainer-id");
 
         registerListeners();
         registerCommands();
@@ -121,7 +128,7 @@ public class Postie {
      */
     private void registerCommands() {
         commandManager.registerCommands(new AnswerCommand(), new InviteCommand(), new PrivacyCommand(), new StatsCommand(), new VersionCommand(),
-                new ReloadCommand(), new RemoveCommand(), new HelpCommand(),
+                new ReloadCommand(), new RemoveCommand(), new HelpCommand(), new BroadcastCommand(), new NoBroadcastsCommand(),
                 new VoteCommand(), new DiceCommand(), new RandomizeCommand(), new DefaultLevelCommand(),
                 new SetlevelCommand(), new LevelCommand(), new EnableCommand(), new DisableCommand(), new LeaveCommand());
     }
@@ -133,6 +140,7 @@ public class Postie {
         builder.addEventListener(new ReadyListener());
         builder.addEventListener(new MessageReceiveListener());
         builder.addEventListener(new ReactionListener());
+        builder.addEventListener(new PrivateMessageReceiveListener());
     }
 
     public CommandManager getCommandManager() {
@@ -171,5 +179,9 @@ public class Postie {
      */
     public String getInviteLink(JDA jda) {
         return String.format("https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot", jda.getSelfUser().getId());
+    }
+
+    public String getMaintainerId() {
+        return maintainerId;
     }
 }

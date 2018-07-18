@@ -75,6 +75,17 @@ public class DataManager {
     }
 
     /**
+     * Saves a {@link JSONObject} in the database after storing a new value in it.
+     *
+     * @param identifier The unique ID (e.g. a discord guild/user id)
+     * @param key        The key of the value, used to get the value later.
+     * @param value      The value, that can be a number, a boolean, a string...
+     */
+    public void save(String identifier, String key, String value) {
+        save(identifier, get(identifier).put(key, value));
+    }
+
+    /**
      * Removes something from the database.
      *
      * @param identifier The unique ID (e.g. a discord guild/user id).
@@ -128,7 +139,7 @@ public class DataManager {
             if (set.next()) {
                 String raw = set.getString("context").trim();
                 if (!raw.startsWith("{") || !raw.endsWith("}")) {
-                    logger.warn("Inappropriate JSON data");
+                    logger.warn("Invalid JSON data");
                     return new JSONObject();
                 }
                 return new JSONObject(raw);

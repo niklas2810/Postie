@@ -75,6 +75,7 @@ public class StatsCommand implements Command {
         result.addField("RAM", usedMemory + " / " + maxMemory);
         result.addField("JDA version", JDAInfo.VERSION);
         result.addField("Bot version", "v. " + VersionInfo.VERSION);
+        result.addField("Build date", VersionInfo.BUILD_DATE);
         result.addField("Ping", message.getJDA().getPing() + "ms");
         result.addField("Java version", System.getProperty("java.runtime.version").replace("+", "_"));
         result.addField("Uptime", days + " Days, " + hours + "Hours, " + minutes + " Minutes and " + seconds + " Seconds");

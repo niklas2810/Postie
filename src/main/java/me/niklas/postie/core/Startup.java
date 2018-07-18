@@ -30,9 +30,9 @@ public class Startup {
     public static void main(String[] args) {
         ConfigurationVerifier verifier = new ConfigurationVerifier();
         verifier.require("api-token", "Please enter your API-Token from https://discordapp.com/developers/applications/me !");
-
+        verifier.require("maintainer-id", "Please enter the token of the bot owner (probably yours, you can find it by right-clicking your name (developer mode must be enabled) and selecting \"Copy ID\")!");
         if (!verifier.isConfigurationValid()) {
-            LoggerFactory.getLogger(Startup.class).info("Please verify that your config.yml file is valid. If that is not in case, please delete it.");
+            LoggerFactory.getLogger(Startup.class).info("Please verify that your config.yml file is valid. If that is not in case, please delete it or fix it manually.");
             System.exit(1);
         }
 
