@@ -56,8 +56,7 @@ public class NoBroadcastsCommand implements Command {
     @Override
     public Result execute(Message message, String[] args) {
         JSONObject data = Postie.getInstance().getDataManager().get(message.getGuild().getId());
-        boolean doBroadcasts = data.has("broadcasts") ? data.getBoolean("broadcasts") : true;
-        ;
+        boolean doBroadcasts = !data.has("broadcasts") || data.getBoolean("broadcasts");
 
         doBroadcasts = !doBroadcasts; //Toggle the value
 

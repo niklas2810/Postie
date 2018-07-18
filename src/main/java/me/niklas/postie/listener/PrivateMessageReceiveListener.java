@@ -50,7 +50,7 @@ public class PrivateMessageReceiveListener extends ListenerAdapter {
                     try {
                         g.getDefaultChannel().sendMessage(message).queue();
                     } catch (Exception expected) {
-                    } //If the bot has not the permission to do it.
+                    } //If the bot has not the permission to send the message, an error will occur.
                 }
 
                 confirmation.editMessage("All messages has been sent.").queue();
