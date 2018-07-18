@@ -42,25 +42,24 @@ public class MessageReceiveListener extends ListenerAdapter {
         if (event.getAuthor().isBot()) return;
 
         Message message = event.getMessage();
-        if (message.getMentionedMembers().size() > 0 && message.getMentionedMembers().get(0).equals(event.getGuild().getSelfMember())) {
-            if (message.getContentDisplay().startsWith("@")) {
-                try {
-                    Instruction instruction = CommandBuilder.build(message);
-                    Result r = Postie.getInstance().getCommandManager().handle(instruction);
-                    if (r != null) {
-                        r.send();
-                    } else { //Not found OR answer
-                        if (Postie.getInstance().getAnswersManager().hasAnswerFor(message.getGuild().getId(), instruction.getAllInput())) {
-                            new Result(Postie.getInstance().getAnswersManager().getAnswerForInput(message.getGuild().getId(), instruction.getAllInput()), message).send();
-                        } else {
-                            message.addReaction("\u2754").queue();
-                        }
+        if (message.getMentionedMembers().size() > 0 && message.getMentionedMembers().get(0).equals(event.getGuild().getSelfMember())
+                && message.getContentDisplay().startsWith("@")) {
+            try {
+                Instruction instruction = CommandBuilder.build(message);
+                Result r = Postie.getInstance().getCommandManager().handle(instruction);
+                if (r != null) {
+                    r.send();
+                } else { //Not found OR answer
+                    if (Postie.getInstance().getAnswersManager().hasAnswerFor(message.getGuild().getId(), instruction.getAllInput())) {
+                        new Result(Postie.getInstance().getAnswersManager().getAnswerForInput(message.getGuild().getId(), instruction.getAllInput()), message).send();
+                    } else {
+                        message.addReaction("\u2754").queue();
                     }
-                } catch (BotNotMentionedException e) {
-                    LoggerFactory.getLogger(this.getClass()).error("The bot has not been mentioned: ", e);
-                } catch (PermissionException e) {
-                    new Result("Lack of Permission", "I need the permission `" + e.getPermission() + "` to work properly!", message).send();
                 }
+            } catch (BotNotMentionedException e) {
+                LoggerFactory.getLogger(this.getClass()).error("The bot has not been mentioned: ", e);
+            } catch (PermissionException e) {
+                new Result("Lack of Permission", "I need the permission `" + e.getPermission() + "` to work properly!", message).send();
             }
 
         }

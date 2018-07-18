@@ -15,38 +15,37 @@
  *  limitations under the License.
  */
 
-package me.niklas.postie.command.general;
+package me.niklas.postie.command.broadcasting;
 
 import me.niklas.postie.command.Command;
 import me.niklas.postie.command.Result;
 import me.niklas.postie.core.Postie;
-import me.niklas.postie.util.Reactions;
 import net.dv8tion.jda.core.entities.Message;
 import net.dv8tion.jda.core.entities.PrivateChannel;
 
 /**
- * Created by Niklas on 20.06.2018 in postie
+ * Created by Niklas on 18.07.2018 in postie
  */
-public class InviteCommand implements Command {
+public class BroadcastCommand implements Command {
 
     @Override
     public String getName() {
-        return "invite";
+        return "broadcast";
     }
 
     @Override
     public String[] getAliases() {
-        return new String[0];
+        return new String[]{"br"};
     }
 
     @Override
     public String getDescription() {
-        return "Sends an invite link to the user.";
+        return "Writes something into every server (default channel), only usable by the maintainer of the bot instance.";
     }
 
     @Override
     public String[] getExamples() {
-        return new String[]{"invite"};
+        return new String[]{"broadcast Today I have to announce something very important[...]"};
     }
 
     @Override
@@ -56,10 +55,15 @@ public class InviteCommand implements Command {
 
     @Override
     public Result execute(Message message, String[] args) {
+        boolean valid = message.getAuthor().getId().equals(Postie.getInstance().getMaintainerId());
+
+        if (!valid) {
+            return new Result("Only the bot maintainer is permitted to do that.", message);
+        }
         PrivateChannel channel = message.getAuthor().openPrivateChannel().complete();
-        String inviteLink = String.format("You can invite me to your guild using this link: %s", Postie.getInstance().getInviteLink(message.getJDA()));
-        channel.sendMessage(inviteLink).queue();
-        message.addReaction(Reactions.WHITE_CHECK_MARK).queue();
-        return new Result(message);
+        channel.sendMessage("Hey there! Simply enter the message you want to broadcast here. Send `confirm` to " +
+                "confirm your input, then it will be broadcasted. Happy typing!").queue();
+        channel.close().queue();
+        return new Result("Check your direct messages!", message);
     }
 }

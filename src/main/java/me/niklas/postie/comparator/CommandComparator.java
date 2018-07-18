@@ -27,7 +27,8 @@ import java.util.Comparator;
 public class CommandComparator implements Comparator<Command> {
 
     /**
-     * Compares two {@link Command}s by name.
+     * Compares two {@link Command}s by their required permission level.
+     * If they are equal, the are compared by name.
      * Used in the {@link me.niklas.postie.manager.CommandManager}.
      *
      * @param first  The first {@link Command}.
@@ -36,6 +37,8 @@ public class CommandComparator implements Comparator<Command> {
      */
     @Override
     public int compare(Command first, Command second) {
+        int levelComparison = Integer.compare(first.getRequiredLevel(), second.getRequiredLevel());
+        if (levelComparison != 0) return levelComparison;
         return first.getName().compareTo(second.getName());
     }
 }

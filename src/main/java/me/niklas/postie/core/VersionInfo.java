@@ -26,8 +26,12 @@ public class VersionInfo {
     public static final String VERSION;
     private static final String VERSION_RAW = "@VERSION@";
 
+    public static final String BUILD_DATE;
+    private static final String BUILD_DATE_RAW = "@DATE@";
+
     static {
         //noinspection ConstantConditions
         VERSION = VERSION_RAW.startsWith("@") ? "DEVELOPMENT" : VERSION_RAW;
+        BUILD_DATE = BUILD_DATE_RAW.startsWith("@") ? "DEBUG_BUILD" : BUILD_DATE_RAW;
     }
 }

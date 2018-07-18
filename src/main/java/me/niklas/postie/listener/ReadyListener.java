@@ -17,11 +17,13 @@
 
 package me.niklas.postie.listener;
 
+
 import me.niklas.postie.core.Postie;
 import me.niklas.postie.core.VersionInfo;
 import net.dv8tion.jda.core.entities.Game;
 import net.dv8tion.jda.core.events.ReadyEvent;
 import net.dv8tion.jda.core.hooks.ListenerAdapter;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by Niklas on 20.06.2018 in postie
@@ -30,6 +32,10 @@ public class ReadyListener extends ListenerAdapter {
 
     @Override
     public void onReady(ReadyEvent event) {
-        event.getJDA().getPresence().setGame(Game.of(Game.GameType.DEFAULT, "v. " + VersionInfo.VERSION, Postie.getInstance().getInviteLink(event.getJDA())));
+        event.getJDA().getPresence().setGame(Game.of(Game.GameType.DEFAULT, "v. " + VersionInfo.VERSION +
+                        " | @" + event.getJDA().getSelfUser().getName() + " help",
+                Postie.getInstance().getInviteLink(event.getJDA())));
+        LoggerFactory.getLogger("Invite Link").info(Postie.getInstance().getInviteLink(event.getJDA()));
+
     }
 }

@@ -19,40 +19,43 @@ package me.niklas.postie.command.general;
 
 import me.niklas.postie.command.Command;
 import me.niklas.postie.command.Result;
-import me.niklas.postie.core.VersionInfo;
+import me.niklas.postie.core.Postie;
 import net.dv8tion.jda.core.entities.Message;
 
 /**
- * Created by Niklas on 05.06.2018 in postie
+ * Created by Niklas on 23.06.2018 in postie
  */
-public class VersionCommand implements Command {
+public class ReloadCommand implements Command {
+
     @Override
     public String getName() {
-        return "version";
+        return "reload";
     }
 
     @Override
     public String[] getAliases() {
-        return new String[]{"v"};
+        return new String[0];
     }
 
     @Override
     public String getDescription() {
-        return "Prints out the version of the bot.";
+        return "Reloads the bot";
     }
 
     @Override
     public String[] getExamples() {
-        return new String[]{"version"};
+        return new String[0];
     }
 
     @Override
     public int getRequiredLevel() {
-        return 1;
+        //This will never be executable for users, but in debug mode the ability is present.
+        return 5;
     }
 
     @Override
     public Result execute(Message message, String[] args) {
-        return new Result("Version", "My current version is v. " + VersionInfo.VERSION, message);
+        Postie.getInstance().performReload();
+        return new Result("A result has been performed.", message);
     }
 }

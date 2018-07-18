@@ -52,6 +52,11 @@ public class VoteCommand implements Command {
     }
 
     @Override
+    public int getRequiredLevel() {
+        return 2;
+    }
+
+    @Override
     public Result execute(Message message, String[] args) {
         String input = String.join(" ", args).trim();
 

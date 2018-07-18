@@ -17,7 +17,7 @@
 
 package me.niklas.postie.manager;
 
-import org.apache.tomcat.jdbc.pool.DataSource;
+import me.niklas.postie.core.Postie;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,27 +34,14 @@ import java.util.Map;
 public class AnswersManager {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final String path = "data.db";
     private final Map<String, Map<String, String>> answers = new HashMap<>();
-    private final DataSource source = new DataSource();
-
+    private final DatabaseManager database;
 
     public AnswersManager() {
-        source.setMinIdle(3);
-        source.setMaxIdle(8);
-        source.setUrl("jdbc:sqlite:" + path);
-        source.setDriverClassName("org.sqlite.JDBC");
-        logger.info("Database path: " + path);
+        database = Postie.getInstance().getDatabaseManager();
 
-        try (Connection connection = source.getConnection();
-             PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS io(guildId TEXT NOT NULL, input TEXT NOT NULL, answer TEXT NOT NULL)")) {
-            statement.execute();
-            statement.close();
-            logger.info("Established a connection to the database file!");
-        } catch (SQLException e) {
-            logger.warn("Was not able to establish a connection to the database: ", e);
-        }
-        logger.debug("Got data from " + answers.size() + " guilds!");
+        database.execute("CREATE TABLE IF NOT EXISTS io(guildId TEXT NOT NULL, input TEXT NOT NULL, answer TEXT NOT NULL)");
+
         retrieveFromDatabase();
     }
 
@@ -110,15 +97,7 @@ public class AnswersManager {
         }
 
         answers.get(guildId).put(input, answer);
-        try (Connection connection = source.getConnection();
-             PreparedStatement statement = connection.prepareStatement("INSERT into io(guildId, input, answer) VALUES(?,?,?)")) {
-            statement.setString(1, guildId);
-            statement.setString(2, input);
-            statement.setString(3, answer);
-            statement.execute();
-        } catch (SQLException e) {
-            logger.warn("Was not able to establish a connection to the database: ", e);
-        }
+        database.execute("INSERT into io(guildId, input, answer) VALUES(?,?,?)", guildId, input, answer);
     }
 
     /**
@@ -131,14 +110,7 @@ public class AnswersManager {
         if (!answers.containsKey(guildId)) answers.put(guildId, new HashMap<>());
 
         answers.get(guildId).remove(input);
-        try (Connection connection = source.getConnection();
-             PreparedStatement statement = connection.prepareStatement("DELETE FROM io WHERE guildId = ? AND input = ?")) {
-            statement.setString(1, guildId);
-            statement.setString(2, input);
-            statement.execute();
-        } catch (SQLException e) {
-            logger.warn("Was not able to establish a connection to the database: ", e);
-        }
+        database.execute("DELETE FROM io WHERE guildId = ? AND input = ?", guildId, input);
     }
 
     /**
@@ -148,31 +120,25 @@ public class AnswersManager {
      */
     public void removeGuild(String guildId) {
         answers.remove(guildId);
-        try (Connection connection = source.getConnection();
-             PreparedStatement statement = connection.prepareStatement("DELETE FROM io WHERE guildId = ?")) {
-            statement.setString(1, guildId);
-            statement.execute();
-        } catch (SQLException e) {
-            logger.warn("Was not able to establish a connection to the database: ", e);
-        }
+        database.execute("DELETE FROM io WHERE guildId = ?", guildId);
     }
 
     /**
      * Retrieves all values from the table and stores them into the "answers" variable.
      */
-    private void retrieveFromDatabase() {
-        try (Connection connection = source.getConnection();
-             PreparedStatement statement = connection.prepareStatement("SELECT * FROM io")) {
-            ResultSet result = statement.executeQuery();
+    public void retrieveFromDatabase() {
+        answers.clear();
+
+        try (Connection connection = database.getSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement("SELECT * FROM io");
+             ResultSet result = statement.executeQuery()) {
             while (result.next()) {
                 String guildId = result.getString("guildId");
                 String input = result.getString("input");
                 String answer = result.getString("answer");
                 if (!answers.containsKey(guildId)) answers.put(guildId, new HashMap<>());
-
                 answers.get(guildId).put(input, answer);
             }
-            result.close();
         } catch (SQLException e) {
             logger.warn("Was not able to establish a connection to the database: ", e);
         }

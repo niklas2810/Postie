@@ -48,6 +48,11 @@ public class DiceCommand implements Command {
     }
 
     @Override
+    public int getRequiredLevel() {
+        return 1;
+    }
+
+    @Override
     public Result execute(Message message, String[] args) {
         int dice = new Random().nextInt(6) + 1;
         return new Result("Dice", "You rolled a " + dice, message);

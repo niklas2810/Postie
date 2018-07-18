@@ -24,8 +24,6 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,7 +33,6 @@ class ConfigurationVerifier {
 
     private final File file = new File("config.yml");
     private final Map<String, String> config = new HashedMap<>();
-    private final List<String> requirements = new ArrayList<>();
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final Yaml yaml;

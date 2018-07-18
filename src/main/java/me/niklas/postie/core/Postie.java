@@ -17,17 +17,23 @@
 
 package me.niklas.postie.core;
 
+import me.niklas.postie.command.broadcasting.BroadcastCommand;
+import me.niklas.postie.command.broadcasting.NoBroadcastsCommand;
 import me.niklas.postie.command.general.*;
+import me.niklas.postie.command.managment.DisableCommand;
+import me.niklas.postie.command.managment.EnableCommand;
+import me.niklas.postie.command.managment.LeaveCommand;
+import me.niklas.postie.command.permissions.DefaultLevelCommand;
+import me.niklas.postie.command.permissions.LevelCommand;
+import me.niklas.postie.command.permissions.SetlevelCommand;
 import me.niklas.postie.command.random.DiceCommand;
 import me.niklas.postie.command.random.RandomizeCommand;
 import me.niklas.postie.command.voting.VoteCommand;
 import me.niklas.postie.listener.MessageReceiveListener;
+import me.niklas.postie.listener.PrivateMessageReceiveListener;
 import me.niklas.postie.listener.ReactionListener;
 import me.niklas.postie.listener.ReadyListener;
-import me.niklas.postie.manager.AnswersManager;
-import me.niklas.postie.manager.CommandManager;
-import me.niklas.postie.manager.ReactionManager;
-import me.niklas.postie.manager.StandardsManager;
+import me.niklas.postie.manager.*;
 import net.dv8tion.jda.core.AccountType;
 import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.JDABuilder;
@@ -46,14 +52,29 @@ public class Postie {
 
     private static Postie instance;
     private final Logger logger = LoggerFactory.getLogger(Postie.class);
+
+    //Most basic managers
     private final CommandManager commandManager = new CommandManager();
     private final StandardsManager standardsManager = new StandardsManager();
+    private final DatabaseManager databaseManager = new DatabaseManager();
     private final ReactionManager reactionManager = new ReactionManager();
-    private final AnswersManager answersManager = new AnswersManager();
+
+    //More advanced managers, depending on the above
+    private final AnswersManager answersManager;
+    private final PermissionManager permissionManager;
+    private final DataManager dataManager;
+
+    private String maintainerId;
+
     private JDABuilder builder;
 
     public Postie() {
         instance = this;
+
+        answersManager = new AnswersManager();
+        permissionManager = new PermissionManager();
+        dataManager = new DataManager();
+
         connect();
     }
 
@@ -68,12 +89,13 @@ public class Postie {
         builder.setAutoReconnect(true);
         builder.setToken(verifier.getConfig().get("api-token"));
 
+        maintainerId = verifier.getConfig().get("maintainer-id");
+
         registerListeners();
         registerCommands();
 
         logger.info("Registered " + commandManager.getCommands().size() + " commands");
         logger.info("Configuration path: " + verifier.getConfigurationFilePath());
-
         try {
             builder.buildBlocking();
         } catch (LoginException e) {
@@ -87,18 +109,28 @@ public class Postie {
             }
             verifier.saveConfiguration();
             logger.info("The new token has been saved. Please restart to connect to Discord.");
-            System.exit(0);
         } catch (Exception e) {
             logger.error("An error occurred while running the discord bot: ", e);
         }
     }
 
     /**
+     * Performs a reload, reads in all data again.
+     */
+    public void performReload() {
+        permissionManager.retrieveFromDatabase();
+        answersManager.retrieveFromDatabase();
+        dataManager.clearCache();
+    }
+
+    /**
      * Registers all commands, to keep connect() maintainable.
      */
     private void registerCommands() {
-        commandManager.registerCommands(new AnswerCommand(), new InviteCommand(), new VersionCommand(), new RemoveCommand(), new HelpCommand(),
-                new VoteCommand(), new DiceCommand(), new RandomizeCommand());
+        commandManager.registerCommands(new AnswerCommand(), new InviteCommand(), new PrivacyCommand(), new StatsCommand(), new VersionCommand(),
+                new ReloadCommand(), new RemoveCommand(), new HelpCommand(), new BroadcastCommand(), new NoBroadcastsCommand(),
+                new VoteCommand(), new DiceCommand(), new RandomizeCommand(), new DefaultLevelCommand(),
+                new SetlevelCommand(), new LevelCommand(), new EnableCommand(), new DisableCommand(), new LeaveCommand());
     }
 
     /**
@@ -108,6 +140,7 @@ public class Postie {
         builder.addEventListener(new ReadyListener());
         builder.addEventListener(new MessageReceiveListener());
         builder.addEventListener(new ReactionListener());
+        builder.addEventListener(new PrivateMessageReceiveListener());
     }
 
     public CommandManager getCommandManager() {
@@ -126,6 +159,18 @@ public class Postie {
         return answersManager;
     }
 
+    public DatabaseManager getDatabaseManager() {
+        return databaseManager;
+    }
+
+    public PermissionManager getPermissionManager() {
+        return permissionManager;
+    }
+
+    public DataManager getDataManager() {
+        return dataManager;
+    }
+
     /**
      * Returns an invite link which can be used to add the bot to a guild.
      *
@@ -134,5 +179,9 @@ public class Postie {
      */
     public String getInviteLink(JDA jda) {
         return String.format("https://discordapp.com/oauth2/authorize?client_id=%s&scope=bot", jda.getSelfUser().getId());
+    }
+
+    public String getMaintainerId() {
+        return maintainerId;
     }
 }

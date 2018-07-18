@@ -15,37 +15,36 @@
  *  limitations under the License.
  */
 
-package me.niklas.postie.command.general;
+package me.niklas.postie.command.managment;
 
 import me.niklas.postie.command.Command;
 import me.niklas.postie.command.Result;
 import me.niklas.postie.core.Postie;
-import me.niklas.postie.util.Util;
 import net.dv8tion.jda.core.entities.Message;
-import net.dv8tion.jda.core.entities.MessageHistory;
 
 /**
- * Created by Niklas on 08.06.2018 in postie
+ * Created by Niklas on 23.06.2018 in postie
  */
-public class RemoveCommand implements Command {
+public class DisableCommand implements Command {
+
     @Override
     public String getName() {
-        return "remove";
+        return "disable";
     }
 
     @Override
     public String[] getAliases() {
-        return new String[]{"rm", "clear"};
+        return new String[]{"deactivate"};
     }
 
     @Override
     public String getDescription() {
-        return "Removes a message by ID / a specific amount of messages.";
+        return "Disables a commands, makes it inaccessible for users.";
     }
 
     @Override
     public String[] getExamples() {
-        return new String[]{"remove 454714441901015040", "remove 10"};
+        return new String[]{"disable vote", "disable dice"};
     }
 
     @Override
@@ -57,21 +56,14 @@ public class RemoveCommand implements Command {
     public Result execute(Message message, String[] args) {
         if (args.length != 1) return Postie.getInstance().getStandardsManager().getExamples(this, message);
 
-        if (args[0].length() > 3) { //Supposed to be a message id
-            Message mentioned = message.getChannel().getMessageById(args[0]).complete();
-            if (mentioned == null) return new Result("Not found", "A message with that id was not found.", message);
-            mentioned.delete().queue();
-            message.addReaction("\u2705").queue();
-            return new Result("", "", message);
+        if (Postie.getInstance().getCommandManager().getCommands().stream().noneMatch(
+                command -> command.getName().equalsIgnoreCase(args[0]))) {
+            return new Result("Error", String.format("The command `%s` was not found!", args[0].toLowerCase()), message);
         }
-
-        //Amount of messages to be deleted
-        if (!Util.isInteger(args[0])) {
-            return new Result("Error", "That is not a valid number!", message);
+        if (args[0].equalsIgnoreCase("enable") || args[0].equalsIgnoreCase("disable")) {
+            return new Result(String.format("You can not disable `%s`!", args[0].toLowerCase()), message);
         }
-        int amount = Integer.valueOf(args[0]);
-        MessageHistory history = message.getChannel().getHistory();
-        message.getTextChannel().deleteMessages(history.retrievePast(amount).complete()).queue();
-        return null;
+        Postie.getInstance().getCommandManager().disableCommand(message.getGuild().getId(), args[0]);
+        return new Result("Disabled", String.format("The command `%s` has been disabled.", args[0].toLowerCase()), message).deleteOrigin(true);
     }
 }

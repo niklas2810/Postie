@@ -15,44 +15,49 @@
  *  limitations under the License.
  */
 
-package me.niklas.postie.command.general;
+package me.niklas.postie.command.managment;
 
 import me.niklas.postie.command.Command;
 import me.niklas.postie.command.Result;
-import me.niklas.postie.core.VersionInfo;
+import me.niklas.postie.core.Postie;
 import net.dv8tion.jda.core.entities.Message;
 
 /**
- * Created by Niklas on 05.06.2018 in postie
+ * Created by Niklas on 15.07.2018 in postie
  */
-public class VersionCommand implements Command {
+public class LeaveCommand implements Command {
     @Override
     public String getName() {
-        return "version";
+        return "leave";
     }
 
     @Override
     public String[] getAliases() {
-        return new String[]{"v"};
+        return new String[0];
     }
 
     @Override
     public String getDescription() {
-        return "Prints out the version of the bot.";
+        return "Deletes all data about the guild & makes the bot leave the server.";
     }
 
     @Override
     public String[] getExamples() {
-        return new String[]{"version"};
+        return new String[]{"leave"};
     }
 
     @Override
     public int getRequiredLevel() {
-        return 1;
+        return 3;
     }
 
     @Override
     public Result execute(Message message, String[] args) {
-        return new Result("Version", "My current version is v. " + VersionInfo.VERSION, message);
+        String guildId = message.getGuild().getId();
+        Postie.getInstance().getPermissionManager().removeGuild(guildId);
+        Postie.getInstance().getDataManager().remove(guildId);
+        Postie.getInstance().getAnswersManager().removeGuild(guildId);
+        message.getGuild().leave().queue();
+        return new Result(message);
     }
 }

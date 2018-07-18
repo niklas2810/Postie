@@ -19,9 +19,12 @@ package me.niklas.postie.command;
 
 import net.dv8tion.jda.core.EmbedBuilder;
 import net.dv8tion.jda.core.entities.Message;
+import net.dv8tion.jda.core.utils.tuple.Pair;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Niklas on 05.06.2018 in postie
@@ -32,6 +35,7 @@ public class Result {
     private final String description;
     private final Message origin;
     private final List<String> reactions = new ArrayList<>();
+    private final Map<Pair<String, String>, Boolean> fields = new HashMap<>();
     private boolean deleteOrigin = false;
     private String tag = "";
     private boolean useEmbed = true;
@@ -43,8 +47,8 @@ public class Result {
      */
     public Result(Message origin) {
         this.origin = origin;
-        this.title = null;
-        this.description = null;
+        this.title = "";
+        this.description = "";
     }
 
     /**
@@ -67,8 +71,8 @@ public class Result {
      * @param origin The original {@link Message}.
      */
     public Result(String text, Message origin) {
-        this.title = "";
-        this.description = text;
+        this.title = text;
+        this.description = "";
         this.origin = origin;
         this.useEmbed = false;
     }
@@ -145,22 +149,56 @@ public class Result {
     }
 
     /**
+     * Adds a  {@link net.dv8tion.jda.core.entities.MessageEmbed.Field}.
+     *
+     * @param title  The title of the {@link net.dv8tion.jda.core.entities.MessageEmbed.Field}.
+     * @param text   The text of the {@link net.dv8tion.jda.core.entities.MessageEmbed.Field}.
+     * @param inline Whether the  {@link net.dv8tion.jda.core.entities.MessageEmbed.Field} should be inlined.
+     */
+    public void addField(String title, String text, boolean inline) {
+        fields.put(new Pair<String, String>() {
+            @Override
+            public String getLeft() {
+                return title;
+            }
+
+            @Override
+            public String getRight() {
+                return text;
+            }
+        }, inline);
+    }
+
+    /**
+     * Adds a  {@link net.dv8tion.jda.core.entities.MessageEmbed.Field}.
+     *
+     * @param title The title of the {@link net.dv8tion.jda.core.entities.MessageEmbed.Field}.
+     * @param text  The text of the {@link net.dv8tion.jda.core.entities.MessageEmbed.Field}.
+     */
+    public void addField(String title, String text) {
+        addField(title, text, true);
+    }
+
+    /**
      * Sends the {@link Message} into the same {@link net.dv8tion.jda.core.entities.MessageChannel} as the original {@link Message}.
      */
     public void send() {
-        if (!useEmbed) {
-            origin.getChannel().sendMessage(description).queue(message -> {
+        if (!useEmbed && fields.size() == 0) {
+            origin.getChannel().sendMessage(title).queue(message -> {
                 if (reactions.size() > 0) {
                     reactions.forEach(reaction -> message.addReaction(reaction).queue());
                 }
             });
-        } else if (title != null && title.length() > 0 && description != null && description.length() > 0) {
+        } else if (title != null && title.length() > 0 && description != null) {
             EmbedBuilder builder = new EmbedBuilder();
             builder.setTitle("Postie - " + title);
             builder.setDescription(description);
             String footer = "Reply to " + origin.getMember().getEffectiveName();
             footer += tag != null ? " <" + tag + ">" : "";
             builder.setFooter(footer, origin.getAuthor().getAvatarUrl());
+
+            fields.forEach((text, inline) -> builder.addField(text.getLeft(), text.getRight(), inline));
+
             origin.getChannel().sendMessage(builder.build()).queue(message -> {
                 if (reactions.size() > 0) {
                     reactions.forEach(reaction -> message.addReaction(reaction).queue());

@@ -20,10 +20,7 @@ package me.niklas.postie.command.general;
 import me.niklas.postie.command.Command;
 import me.niklas.postie.command.Result;
 import me.niklas.postie.core.Postie;
-import net.dv8tion.jda.core.JDA;
 import net.dv8tion.jda.core.entities.Message;
-
-import java.util.List;
 
 /**
  * Created by Niklas on 07.06.2018 in postie
@@ -51,9 +48,15 @@ public class HelpCommand implements Command {
     }
 
     @Override
+    public int getRequiredLevel() {
+        return 1;
+    }
+
+    @Override
     public Result execute(Message message, String[] args) {
         if (args.length == 0) {
-            return new Result("General Help", getDefaultHelp(message.getJDA()), message);
+            //return new Result("General Help", getDefaultHelp(message.getJDA()), message);
+            return getDefaultResultHelp(message);
         }
         if (args.length == 1) {
             if (!Postie.getInstance().getCommandManager().hasCommand(args[0])) {
@@ -64,13 +67,13 @@ public class HelpCommand implements Command {
         return Postie.getInstance().getStandardsManager().getExamples(this, message);
     }
 
-    private String getDefaultHelp(JDA jda) {
-        List<Command> commandList = Postie.getInstance().getCommandManager().getCommands();
-        StringBuilder builder = new StringBuilder();
-        commandList.forEach(command -> builder.append("`").append(command.getName()).append("` - ").append(command.getDescription()).append("\n"));
-        builder.append("\nUse `help <command name>` to get a more detailed command description.\n");
-        builder.append("Always feel free to refer to the [Wiki](https://github.com/Chromecube/Postie/wiki) for help or if you have a question.\n");
-        builder.append("You can invite the bot using [this link](").append(Postie.getInstance().getInviteLink(jda)).append(").");
-        return builder.toString().trim();
+    private Result getDefaultResultHelp(Message message) {
+
+        String builder = "\nUse `help <command name>` to get a more detailed command description.\n" +
+                "A list of commands with detailed descriptions is available [online](https://github.com/Chromecube/Postie/wiki/Command-List).\n" +
+                "If you don't know how to get started, refer to [this Wiki page](https://github.com/Chromecube/Postie/wiki/Quick-Start-Guide).\n" +
+                "Always feel free to refer to the [Wiki](https://github.com/Chromecube/Postie/wiki) if you have any question or problem.\n\n" +
+                "You can invite the bot using [this link](" + Postie.getInstance().getInviteLink(message.getJDA()) + ").\n";
+        return new Result("General help", builder, message);
     }
 }

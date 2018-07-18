@@ -15,44 +15,56 @@
  *  limitations under the License.
  */
 
-package me.niklas.postie.command.general;
+package me.niklas.postie.command.broadcasting;
+
 
 import me.niklas.postie.command.Command;
 import me.niklas.postie.command.Result;
-import me.niklas.postie.core.VersionInfo;
+import me.niklas.postie.core.Postie;
 import net.dv8tion.jda.core.entities.Message;
+import org.json.JSONObject;
 
 /**
- * Created by Niklas on 05.06.2018 in postie
+ * Created by Niklas on 18.07.2018 in postie
  */
-public class VersionCommand implements Command {
+public class NoBroadcastsCommand implements Command {
     @Override
     public String getName() {
-        return "version";
+        return "nobroadcasts";
     }
 
     @Override
     public String[] getAliases() {
-        return new String[]{"v"};
+        return new String[]{"nobr", "nobrs", "nobroadcast"};
     }
 
     @Override
     public String getDescription() {
-        return "Prints out the version of the bot.";
+        return "Toggles broadcasting for this server.";
     }
 
     @Override
     public String[] getExamples() {
-        return new String[]{"version"};
+        return new String[]{"nobroadcasts", "nobr"};
     }
 
     @Override
     public int getRequiredLevel() {
-        return 1;
+        return 3;
     }
 
     @Override
     public Result execute(Message message, String[] args) {
-        return new Result("Version", "My current version is v. " + VersionInfo.VERSION, message);
+        JSONObject data = Postie.getInstance().getDataManager().get(message.getGuild().getId());
+        boolean doBroadcasts = !data.has("broadcasts") || data.getBoolean("broadcasts");
+
+        doBroadcasts = !doBroadcasts; //Toggle the value
+
+        data.put("broadcasts", doBroadcasts);
+
+        Postie.getInstance().getDataManager().save(message.getGuild().getId(), data);
+        String text = "Broadcasts have been ";
+        text += doBroadcasts ? "enabled." : "disabled.";
+        return new Result("Success", text, message);
     }
 }
