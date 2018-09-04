@@ -20,14 +20,13 @@ import org.apache.tools.ant.filters.ReplaceTokens
 plugins {
     id 'java'
     id 'maven'
-    id 'com.github.johnrengelman.shadow' version '2.0.3'
+    id 'com.github.johnrengelman.shadow' version '2.0.4'
 }
 
 group 'me.niklas'
 version '0.2'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
@@ -72,7 +71,11 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 
 javadoc {
     options.encoding = 'UTF-8'
-    options.addBooleanOption('html5', true)
+    if (JavaVersion.current().java9Compatible) {
+        afterEvaluate {
+            options.addBooleanOption("html5", true)
+        }
+    }
 }
 
 jar {
@@ -99,6 +102,4 @@ build {
     shadowJar.mustRunAfter sourcesJar
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.6'
-}
+wrapper.gradleVersion '4.10'
